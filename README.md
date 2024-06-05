@@ -1,2 +1,5 @@
 # gpt
-Generative Pre-trained Transformer from scratch
+
+Generative Pre-trained Transformer in PyTorch
+
+work in progress
