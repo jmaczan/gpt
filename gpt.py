@@ -53,9 +53,12 @@ class PositionalEncoding(nn.Module):
             for embedding_index, embedding in enumerate(batch_item):
                 for index, position in enumerate(embedding):
                     mapped_embeddings[batch_index][embedding_index][index] = (
-                        position + self.pe_even(embedding_index, index, self.d_model)
-                        if index % 2 == 0
-                        else self.pe_odd(embedding_index, index, self.d_model)
+                        position
+                        + (
+                            self.pe_even(embedding_index, index, self.d_model)
+                            if index % 2 == 0
+                            else self.pe_odd(embedding_index, index, self.d_model)
+                        )
                     )
 
         return mapped_embeddings
