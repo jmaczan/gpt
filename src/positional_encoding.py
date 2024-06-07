@@ -27,7 +27,7 @@ class PositionalEncoding(nn.Module):
         odd_index_mask = ~even_index_mask
 
         positional_encodings = torch.zeros(
-            (sequence_length, embedding_dim), dtype=torch.float
+            (sequence_length, embedding_dim), dtype=torch.float32
         )
 
         positional_encodings[:, even_index_mask[0]] = torch.sin(
