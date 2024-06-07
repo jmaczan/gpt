@@ -9,6 +9,7 @@ class TestPositionalEncoding(unittest.TestCase):
         torch.manual_seed(42)
         tensor = torch.rand((3, 4, 5))
         self.pe = PositionalEncoding(embeddings=tensor)
+        print(self.pe.positional_encodings)
 
     def tearDown(self) -> None:
         self.pe = None
