@@ -4,11 +4,11 @@ from torch.nn import functional as F
 
 
 class PositionalEncoding(nn.Module):
-    def __init__(self, sequence_length, embedding_dim):
+    def __init__(self, sequence_length, embedding_dim, n=10_000):
         super().__init__()
 
         self.positional_encodings = self.precompute_encodings(
-            sequence_length, embedding_dim
+            sequence_length, embedding_dim, n
         )
 
     def forward(self, embeddings):
@@ -18,7 +18,7 @@ class PositionalEncoding(nn.Module):
 
         return embeddings + self.positional_encodings
 
-    def precompute_encodings(self, sequence_length, embedding_dim):
+    def precompute_encodings(self, sequence_length, embedding_dim, n=10_000):
 
         sequence_indices = torch.arange(sequence_length).view(sequence_length, 1)
         embedding_indices = torch.arange(embedding_dim).view(1, embedding_dim)
@@ -31,23 +31,24 @@ class PositionalEncoding(nn.Module):
         )
 
         positional_encodings[:, even_index_mask[0]] = torch.sin(
-            torch.div(
-                sequence_indices,
+            sequence_indices
+            * torch.div(
+                1,
                 torch.pow(
-                    10000,
-                    (2 * torch.div(embedding_indices[even_index_mask], embedding_dim)),
-                ),
+                    n,
+                    (2 * torch.div(embedding_indices // 2, embedding_dim)),
+                )[0],
             )
-        )
+        )[:, even_index_mask[0]]
 
         positional_encodings[:, odd_index_mask[0]] = torch.cos(
             torch.div(
                 sequence_indices,
                 torch.pow(
-                    10000,
-                    (2 * torch.div(embedding_indices[odd_index_mask], embedding_dim)),
+                    n,
+                    (2 * torch.div(embedding_indices // 2, embedding_dim)),
                 ),
             )
-        )
+        )[:, odd_index_mask[0]]
 
         return positional_encodings

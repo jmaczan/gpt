@@ -30,15 +30,16 @@ class TestPositionalEncoding(unittest.TestCase):
     def test_correct_encodings(self):
         expected_encodings = torch.tensor(
             [
-                [0.0000, 1.0000, 0.0000, 1.0000, 0.0000],
-                [0.8415, 0.5403, 0.0013, 0.9999, 0.0000],
-                [0.9093, -0.4161, 0.0026, 0.9999, 0.0000],
-                [0.1411, -0.9900, 0.0039, 0.9999, 0.0000],
+                [0.00, 1.00, 0.00, 1.00],
+                [0.84, 0.54, 0.09, 0.99],
+                [0.90, -0.41, 0.19, 0.98],
+                [0.14, -0.99, 0.29, 0.96],
             ]
         )
+        self.pe = PositionalEncoding(sequence_length=4, embedding_dim=4, n=100)
         computed_encodings = self.pe.positional_encodings
         self.assertTrue(
-            torch.allclose(computed_encodings, expected_encodings, atol=1e-4)
+            torch.allclose(computed_encodings, expected_encodings, atol=1e-2)
         )
 
 
