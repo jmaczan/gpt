@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+from attention_head import AttentionHead
+
 torch.manual_seed(1995)
 
 default_context_window = 20
@@ -28,5 +30,8 @@ class GPT(nn.Module):
         super().__init__()
 
         self.embeddings = nn.Embedding(vocabulary_size, embedding_dimension)
-        self.model = nn.Sequential([])
+        self.model = nn.Sequential([AttentionHead])
         self.context_window = context_window
+
+    def forward(self, x):
+        return self.model(x)

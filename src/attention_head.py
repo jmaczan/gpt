@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-from positional_encoding import PositionalEncoding
+from src.positional_encoding import PositionalEncoding
 
 torch.manual_seed(1995)
 
@@ -43,13 +43,14 @@ class AttentionHead(nn.Module):
         attention_scores = Q @ K.transpose(1, 2)
 
         # build -inf upper triangle mask
-        mask = torch.triu(attention_scores, diagonal=1)
+        mask = torch.triu(torch.ones((sequence_length, sequence_length)), diagonal=1)
         mask = mask.masked_fill(mask == 1, float("-inf"))
 
         masked_scores = attention_scores + mask
 
         # softmax
-        probabilities = torch.nn.Softmax(masked_scores)
+        softmax = torch.nn.Softmax(dim=2)
+        probabilities = softmax(masked_scores)
 
         output = probabilities @ V
 
