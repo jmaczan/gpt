@@ -14,9 +14,9 @@ class AttentionHead(nn.Module):
 
         _, _, embedding_dim = embeddings.shape
 
-        self.W_Q = torch.empty((embedding_dim, embedding_dim))
-        self.W_K = torch.empty((embedding_dim, embedding_dim))
-        self.W_V = torch.empty((embedding_dim, embedding_dim))
+        self.W_Q = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
+        self.W_K = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
+        self.W_V = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
 
         nn.init.xavier_uniform_(self.W_Q)
         nn.init.xavier_uniform_(self.W_K)
@@ -40,16 +40,18 @@ class AttentionHead(nn.Module):
         K = embeddings @ self.W_K
         V = embeddings @ self.W_V
 
-        attention_scores = Q @ K.transpose(1, 2)
+        attention_scores = (Q @ K.transpose(1, 2)) / torch.sqrt(
+            torch.tensor(embeddings_dim, dtype=torch.float32)
+        )
 
         # build -inf upper triangle mask
-        mask = torch.triu(torch.ones((sequence_length, sequence_length)), diagonal=1)
+        mask = torch.triu(torch.ones((1, sequence_length, sequence_length)), diagonal=1)
         mask = mask.masked_fill(mask == 1, float("-inf"))
 
         masked_scores = attention_scores + mask
 
         # softmax
-        softmax = torch.nn.Softmax(dim=2)
+        softmax = torch.nn.Softmax(dim=1)
         probabilities = softmax(masked_scores)
 
         output = probabilities @ V
