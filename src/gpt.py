@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-from attention_head import AttentionHead
+from src.attention_head import AttentionHead
+from src.positional_encoding import PositionalEncoding
 
 torch.manual_seed(1995)
 
@@ -30,7 +31,18 @@ class GPT(nn.Module):
         super().__init__()
 
         self.embeddings = nn.Embedding(vocabulary_size, embedding_dimension)
-        self.model = nn.Sequential([AttentionHead])
+        self.positional_encoding = PositionalEncoding(
+            sequence_length=vocabulary_size,
+            embedding_dim=embedding_dimension,
+        )
+        self.model = nn.Sequential(
+            [
+                AttentionHead(
+                    embeddings=self.embeddings,
+                    positional_encoding=self.positional_encoding,
+                )
+            ]
+        )
         self.context_window = context_window
 
     def forward(self, x):

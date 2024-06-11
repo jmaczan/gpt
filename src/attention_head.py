@@ -9,10 +9,12 @@ torch.manual_seed(1995)
 
 class AttentionHead(nn.Module):
 
-    def __init__(self, embeddings):
+    def __init__(self, embeddings, positional_encoding):
         super().__init__()
 
         _, _, embedding_dim = embeddings.shape
+
+        self.positional_encoding = positional_encoding
 
         self.W_Q = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
         self.W_K = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
@@ -27,13 +29,7 @@ class AttentionHead(nn.Module):
             embeddings.shape
         )  # it doesn't take into account splitting embedding_dim per attention head (d_head = d_model / h), where h is number of attention heads
 
-        embeddings = PositionalEncoding(  # I think it can be pulled out to __init__ and reused across batches (good)
-            # or pulled to gpt.py and reused across attention heads (better)
-            sequence_length=sequence_length,
-            embedding_dim=embeddings_dim,
-        ).forward(
-            embeddings
-        )
+        embeddings = self.positional_encoding.forward(embeddings)
 
         # compute Q, K and V for each token in each of embeddings
         Q = embeddings @ self.W_Q
