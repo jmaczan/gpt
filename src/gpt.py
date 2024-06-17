@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-from src.attention_head import AttentionHead
+from src.multi_head_attention import MultiHeadAttention
 from src.positional_encoding import PositionalEncoding
 
 torch.manual_seed(1995)
@@ -10,6 +10,7 @@ torch.manual_seed(1995)
 default_context_window = 20
 default_embedding_dimension = 8
 default_vocabulary_size = 300
+default_attention_heads_count = 8
 
 
 class GPT(nn.Module):
@@ -17,7 +18,7 @@ class GPT(nn.Module):
     Works well with github.com/jmaczan/bpe-tokenizer
 
     About this model:
-    - I learn details while I build, so except messy code, at least until it's declared as finished and polished
+    - I learn details while I build, so expect a messy code, at least until it's declared as finished and polished
     - Decoder-only
     - Might not match all the details of original GPT-2/3, but in general follows the same implementation rules
     """
@@ -27,20 +28,25 @@ class GPT(nn.Module):
         vocabulary_size=default_vocabulary_size,
         embedding_dimension=default_embedding_dimension,
         context_window=default_context_window,
+        heads_count=default_attention_heads_count,
     ):
         super().__init__()
 
         self.embeddings = nn.Embedding(vocabulary_size, embedding_dimension)
+        batch, sequence_length, embeddings_dim = self.embeddings.shape
         self.positional_encoding = PositionalEncoding(
             sequence_length=vocabulary_size,
             embedding_dim=embedding_dimension,
         )
         self.model = nn.Sequential(
             [
-                AttentionHead(
-                    embeddings=self.embeddings,
-                    positional_encoding=self.positional_encoding,
-                )
+                nn.ModuleList(
+                    [
+                        MultiHeadAttention(
+                            embeddings_dim=embeddings_dim, heads_count=heads_count
+                        )
+                    ]
+                ),
             ]
         )
         self.context_window = context_window

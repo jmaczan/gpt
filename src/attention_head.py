@@ -9,10 +9,8 @@ torch.manual_seed(1995)
 
 class AttentionHead(nn.Module):
 
-    def __init__(self, embeddings, positional_encoding):
+    def __init__(self, embedding_dim, positional_encoding):
         super().__init__()
-
-        _, _, embedding_dim = embeddings.shape
 
         self.positional_encoding = positional_encoding
 
