@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
-from torch.nn import functional as F
 
-from src.multi_head_attention import MultiHeadAttention
 from src.positional_encoding import PositionalEncoding
 from transformer_block import TransformerBlock
 
@@ -35,30 +33,35 @@ class GPT(nn.Module):
     ):
         super().__init__()
 
+        self.blocks_count = blocks_count
+        self.context_window = context_window
+
         self.embeddings = nn.Embedding(vocabulary_size, embedding_dimension)
         self.positional_encoding = PositionalEncoding(
             sequence_length=context_window,
             embedding_dim=embedding_dimension,
         )
-        self.blocks_count = blocks_count
-        self.model = nn.Sequential(
+        self.dropout = nn.Dropout(0.1)
+        self.transformer_blocks = nn.ModuleList(
             [
-                self.embeddings,
-                self.positional_encoding,
-                nn.Dropout,
-                [
-                    TransformerBlock(
-                        embeddings_dim=embedding_dimension, heads_count=heads_count
-                    )
-                    for _ in range(self.blocks_count)
-                ],
-                nn.LayerNorm(),
-                nn.Linear(),
+                TransformerBlock(
+                    embeddings_dim=embedding_dimension, heads_count=heads_count
+                )
+                for _ in range(self.blocks_count)
             ]
         )
-        self.context_window = context_window
+        self.layer_norm = nn.LayerNorm()
+        self.linear = nn.Linear()
 
     def forward(self, x):
-        output = self.model(x)
-        softmax = nn.Softmax()
-        return softmax(output)
+        x = self.embeddings(x)
+        x = self.positional_encoding(x)
+        x = self.dropout(x)
+
+        for block in self.transformer_blocks:
+            x = block(x)
+
+        x = self.layer_norm(x)
+        x = self.linear(x)
+
+        return x
