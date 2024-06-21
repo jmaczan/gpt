@@ -4,6 +4,7 @@ from torch.nn import functional as F
 
 from src.multi_head_attention import MultiHeadAttention
 from src.positional_encoding import PositionalEncoding
+from transformer_block import TransformerBlock
 
 torch.manual_seed(1995)
 
@@ -11,6 +12,7 @@ default_context_window = 20
 default_embedding_dimension = 8
 default_vocabulary_size = 300
 default_attention_heads_count = 8
+default_transformer_blocks_count = 4
 
 
 class GPT(nn.Module):
@@ -29,6 +31,7 @@ class GPT(nn.Module):
         embedding_dimension=default_embedding_dimension,
         context_window=default_context_window,
         heads_count=default_attention_heads_count,
+        blocks_count=default_transformer_blocks_count,
     ):
         super().__init__()
 
@@ -37,18 +40,25 @@ class GPT(nn.Module):
             sequence_length=context_window,
             embedding_dim=embedding_dimension,
         )
+        self.blocks_count = blocks_count
         self.model = nn.Sequential(
             [
-                nn.ModuleList(
-                    [
-                        MultiHeadAttention(
-                            embeddings_dim=embedding_dimension, heads_count=heads_count
-                        )
-                    ]
-                ),
+                self.embeddings,
+                self.positional_encoding,
+                nn.Dropout,
+                [
+                    TransformerBlock(
+                        embeddings_dim=embedding_dimension, heads_count=heads_count
+                    )
+                    for _ in range(self.blocks_count)
+                ],
+                nn.LayerNorm(),
+                nn.Linear(),
             ]
         )
         self.context_window = context_window
 
     def forward(self, x):
-        return self.model(x)
+        output = self.model(x)
+        softmax = nn.Softmax()
+        return softmax(output)

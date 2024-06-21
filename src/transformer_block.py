@@ -11,18 +11,22 @@ class TransformerBlock(nn.Module):
         self.heads_count = heads_count
         self.embeddings_dim = embeddings_dim
 
-        self.model = [
-            nn.LayerNorm(),
-            nn.Linear(),
-            MultiHeadAttention(embeddings_dim=embeddings_dim, heads_count=heads_count),
-            nn.Linear(),
-            nn.Dropout(),
-            nn.LayerNorm(),
-            nn.Linear(),
-            nn.GELU(),
-            nn.Linear(),
-            nn.Dropout(),
-        ]
+        self.model = nn.Sequential(
+            [
+                nn.LayerNorm(),
+                nn.Linear(),
+                MultiHeadAttention(
+                    embeddings_dim=embeddings_dim, heads_count=heads_count
+                ),
+                nn.Linear(),
+                nn.Dropout(),
+                nn.LayerNorm(),
+                nn.Linear(),
+                nn.GELU(),
+                nn.Linear(),
+                nn.Dropout(),
+            ]
+        )
 
     def forward(self, x):
         return self.model(x)
