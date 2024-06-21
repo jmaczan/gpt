@@ -18,7 +18,7 @@ class TransformerBlock(nn.Module):
         self.dropout1 = nn.Dropout(p=0.1)
         self.layer_norm2 = nn.LayerNorm(embeddings_dim)
         self.linear1 = nn.Linear(
-            in_featsures=embeddings_dim, out_features=embeddings_dim * 4
+            in_features=embeddings_dim, out_features=embeddings_dim * 4
         )
         self.gelu = nn.GELU()
         self.linear2 = nn.Linear(
@@ -37,7 +37,7 @@ class TransformerBlock(nn.Module):
         x = self.layer_norm2(x)
         x = self.linear1(x)
         x = self.gelu(x)
-        x = self.linear(x)
+        x = self.linear2(x)
         x = self.dropout2(x)
         x = residual + x
 

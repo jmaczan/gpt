@@ -2,17 +2,11 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-from src.positional_encoding import PositionalEncoding
-
-torch.manual_seed(1995)
-
 
 class AttentionHead(nn.Module):
 
-    def __init__(self, embedding_dim, positional_encoding):
+    def __init__(self, embedding_dim):
         super().__init__()
-
-        self.positional_encoding = positional_encoding
 
         self.W_Q = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
         self.W_K = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
@@ -23,11 +17,7 @@ class AttentionHead(nn.Module):
         nn.init.xavier_uniform_(self.W_V)
 
     def forward(self, embeddings):
-        _, sequence_length, embeddings_dim = (
-            embeddings.shape
-        )  # it doesn't take into account splitting embedding_dim per attention head (d_head = d_model / h), where h is number of attention heads
-
-        embeddings = self.positional_encoding.forward(embeddings)
+        _, sequence_length, embeddings_dim = embeddings.shape
 
         # compute Q, K and V for each token in each of embeddings
         Q = embeddings @ self.W_Q
@@ -39,13 +29,15 @@ class AttentionHead(nn.Module):
         )
 
         # build -inf upper triangle mask
-        mask = torch.triu(torch.ones((1, sequence_length, sequence_length)), diagonal=1)
+        mask = torch.triu(
+            torch.ones((1, sequence_length, sequence_length)), diagonal=1
+        ).to(embeddings.device)
         mask = mask.masked_fill(mask == 1, float("-inf"))
 
         masked_scores = attention_scores + mask
 
         # softmax
-        softmax = torch.nn.Softmax(dim=1)
+        softmax = torch.nn.Softmax(dim=-1)
         probabilities = softmax(masked_scores)
 
         output = probabilities @ V

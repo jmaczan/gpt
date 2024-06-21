@@ -10,13 +10,15 @@ class MultiHeadAttention(nn.Module):
 
         self.heads_count = heads_count
         self.embeddings_dim = embeddings_dim
-        self.heads = [
-            AttentionHead(
-                embeddings_dim=embeddings_dim,
-                positional_encoding=self.positional_encoding,
-            )
-            for _ in range(self.heads_count)
-        ]
+        self.single_head_size = embeddings_dim // heads_count
+        self.heads = nn.ModuleList(
+            [
+                AttentionHead(
+                    embeddings_dim=self.single_head_size,
+                )
+                for _ in range(self.heads_count)
+            ]
+        )
 
         self.W_O = nn.Parameter(torch.empty((embeddings_dim, embeddings_dim)))
 

@@ -41,7 +41,7 @@ class GPT(nn.Module):
             sequence_length=context_window,
             embedding_dim=embedding_dimension,
         )
-        self.dropout = nn.Dropout(0.1)
+        self.dropout = nn.Dropout(p=0.1)
         self.transformer_blocks = nn.ModuleList(
             [
                 TransformerBlock(
@@ -50,8 +50,8 @@ class GPT(nn.Module):
                 for _ in range(self.blocks_count)
             ]
         )
-        self.layer_norm = nn.LayerNorm()
-        self.linear = nn.Linear()
+        self.layer_norm = nn.LayerNorm(embedding_dimension)
+        self.linear = nn.Linear(embedding_dimension, vocabulary_size)
 
     def forward(self, x):
         x = self.embeddings(x)
