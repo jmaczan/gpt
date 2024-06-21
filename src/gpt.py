@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from src.positional_encoding import PositionalEncoding
-from transformer_block import TransformerBlock
+from src.transformer_block import TransformerBlock
 
 torch.manual_seed(1995)
 
@@ -55,7 +55,7 @@ class GPT(nn.Module):
 
     def forward(self, x):
         x = self.embeddings(x)
-        x = self.positional_encoding(x)
+        x = x + self.positional_encoding(x)
         x = self.dropout(x)
 
         for block in self.transformer_blocks:
