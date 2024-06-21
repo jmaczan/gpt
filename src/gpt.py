@@ -33,9 +33,8 @@ class GPT(nn.Module):
         super().__init__()
 
         self.embeddings = nn.Embedding(vocabulary_size, embedding_dimension)
-        batch, sequence_length, embeddings_dim = self.embeddings.shape
         self.positional_encoding = PositionalEncoding(
-            sequence_length=vocabulary_size,
+            sequence_length=context_window,
             embedding_dim=embedding_dimension,
         )
         self.model = nn.Sequential(
@@ -43,7 +42,7 @@ class GPT(nn.Module):
                 nn.ModuleList(
                     [
                         MultiHeadAttention(
-                            embeddings_dim=embeddings_dim, heads_count=heads_count
+                            embeddings_dim=embedding_dimension, heads_count=heads_count
                         )
                     ]
                 ),
