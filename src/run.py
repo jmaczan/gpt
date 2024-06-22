@@ -1,27 +1,80 @@
 import torch
 from data_loader import get_tokenizer
 from train import load_checkpoint
-from gpt import (
-    GPT
-)
+from gpt import GPT
+
+default_max_output=100
 
 def load_model(model_path, device):
     checkpoint = torch.load(model_path, map_location=device)
 
-    config = checkpoint['config']
+    config = checkpoint["config"]
 
     model = GPT(
-        vocabulary_size=config['vocabulary_size']
+        vocabulary_size=config["vocabulary_size"],
+        embedding_dimension=config["embedding_dimension"],
+        context_window=config["context_window"],
+        heads_count=config["heads_count"],
+        blocks_count=config["blocks_count"],
     )
 
-def run(model_path='checkpoints/best_model.pth'):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.load_state_dict(checkpoint["model_state_dict"])
+
+    model = model.to(device)
+
+    model.eval()
+
+    return model, config
+
+def prepare_context(text, tokenizer, context_window):
+    tokens = tokenizer.encode(text)
+
+    if len(tokens) > context_window:
+        tokens = tokens[-context_window:]
+    else:
+        tokens = [tokenizer.pad_token_id] * (context_window - len(tokens)) + tokens
+
+    return torch.tensor(tokens).unsqueeze(0)
+
+def inference(prompt, model, tokenizer, context_window, max_output=default_max_output):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    model.eval()
+
+    output = tokenizer.encode(prompt)
+    context = prepare_context(text=prompt, tokenizer=tokenizer, context_window=context_window).to(device)
+
+    with torch.no_grad():
+        for _ in range(max_output):
+            outputs = model(context)
+            next_token = outputs[0, -1, :]
+            next_token = torch.argmax(next_token, dim=-1).item()
+            output.append(next_token)
+
+            print(output)
+
+            context = torch.cat([context, torch.tensor([[next_token]], device=device)], dim=1)
+            context = context[:, -context_window:]
+
+    return tokenizer.decode(output, skip_special_tokens=True)
+
+
+
+def run(model_path="checkpoints/best_model.pth", prompt="Rick: What's up?"):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     tokenizer = get_tokenizer()
-    
-    model=load_model(model_path)
 
-    model = load_checkpoint(model_path, device)
+    model, config = load_model(model_path, device)
+
+    generated_text = inference(prompt=prompt, model=model, tokenizer=tokenizer, context_window=config['context_window'])
+
 
 if __name__ == "__main__":
-    run()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--from-checkpoint", type=str)
+
+    args = parser.parse_args()
+    run(model_path=args.from_checkpoint)
