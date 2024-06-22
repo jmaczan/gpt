@@ -6,7 +6,6 @@ from gpt import (
     GPT,
     default_context_window,
     default_attention_heads_count,
-    default_batch_size,
     default_embedding_dimension,
     default_transformer_blocks_count,
     default_vocabulary_size,
@@ -20,12 +19,15 @@ default_learning_rate = 0.001
 def train(
     num_epochs=default_num_epochs,
     lr=default_learning_rate,
-    vocabulary_size=default_vocabulary_size,
     embedding_dimension=default_embedding_dimension,
     context_window=default_context_window,
     heads_count=default_attention_heads_count,
     blocks_count=default_transformer_blocks_count,
 ):
+    tokenizer = get_tokenizer()
+
+    vocabulary_size = len(tokenizer)
+
     model = GPT(
         vocabulary_size=vocabulary_size,
         embedding_dimension=embedding_dimension,
@@ -33,10 +35,10 @@ def train(
         heads_count=heads_count,
         blocks_count=blocks_count,
     )
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
-    tokenizer = get_tokenizer()
     data_loader = get_data_loader(tokenizer=tokenizer)
 
     criterion = nn.CrossEntropyLoss(ignore_index=tokenizer.pad_token_id)

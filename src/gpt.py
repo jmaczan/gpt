@@ -9,7 +9,7 @@ torch.manual_seed(1995)
 default_context_window = 20
 default_embedding_dimension = 8
 default_vocabulary_size = 300
-default_attention_heads_count = 8
+default_attention_heads_count = 4
 default_transformer_blocks_count = 4
 default_batch_size = 32
 
