@@ -6,11 +6,11 @@ from transformer_block import TransformerBlock
 
 torch.manual_seed(1995)
 
-default_context_window = 20
-default_embedding_dimension = 8
+default_context_window = 512
+default_embedding_dimension = 256
 default_vocabulary_size = 300
 default_attention_heads_count = 4
-default_transformer_blocks_count = 4
+default_transformer_blocks_count = 6
 default_batch_size = 32
 
 
