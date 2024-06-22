@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+import os
 from data_loader import get_data_loader, get_tokenizer
 from gpt import (
     GPT,
@@ -14,6 +14,34 @@ from gpt import (
 
 default_num_epochs = 10
 default_learning_rate = 0.001
+
+checkpoints_directory = "checkpoints"
+os.makedirs(checkpoints_directory, exist_ok=True)
+
+
+def save_checkpoint(model, optimizer, epoch, loss, path):
+    checkpoint = {
+        "epoch": epoch,
+        "model_state_dict": model.state_dict(),
+        "optimizer_state_dict": optimizer.state_dict(),
+        "loss": loss,
+    }
+
+    torch.save(checkpoint, path)
+
+    print(f"Checkpoitn saved at {path}")
+
+
+def load_checkpoint(path, model, optimizer):
+    checkpoint = torch.load(path)
+    model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    epoch = checkpoint["epoch"]
+    loss = checkpoint["loss"]
+
+    print(f"Loaded from checkpoint {path} at epoch {epoch} with loss {loss}")
+
+    return epoch, loss
 
 
 def train(
@@ -57,8 +85,19 @@ def train(
             optimizer.step()
             total_loss += loss.item()
 
-        print(
-            f"Epoch {epoch + 1}/{num_epochs}. Total loss: {total_loss}. Loss: {total_loss/len(data_loader)}"
+        average_loss = total_loss / len(data_loader)
+        print(f"Epoch {epoch + 1}/{num_epochs}. Average loss: {average_loss}")
+
+        checkpoint_path = os.path.join(
+            checkpoints_directory, f"epoch_{epoch + 1}_loss_{average_loss}.pth"
+        )
+
+        save_checkpoint(
+            model=model,
+            optimizer=optimizer,
+            epoch=epoch + 1,
+            loss=average_loss,
+            path=os.path.join(checkpoint_path),
         )
 
 
