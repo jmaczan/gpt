@@ -59,7 +59,7 @@ def inference(prompt, model, tokenizer, context_window, max_output=default_max_o
             output.append(top_k_indices[next_token].item())
 
             print(tokenizer.decode(output, skip_special_tokens=True))
-
+            print('--------------------')
             context = torch.cat([context, torch.tensor([[next_token]], device=device)], dim=1)
             context = context[:, -context_window:]
 
