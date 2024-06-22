@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from src.attention_head import AttentionHead
+from attention_head import AttentionHead
 
 
 class MultiHeadAttention(nn.Module):
@@ -14,7 +14,7 @@ class MultiHeadAttention(nn.Module):
         self.heads = nn.ModuleList(
             [
                 AttentionHead(
-                    embeddings_dim=self.single_head_size,
+                    embedding_dim=self.single_head_size,
                 )
                 for _ in range(self.heads_count)
             ]

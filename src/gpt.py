@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 
-from src.positional_encoding import PositionalEncoding
-from src.transformer_block import TransformerBlock
+from positional_encoding import PositionalEncoding
+from transformer_block import TransformerBlock
 
 torch.manual_seed(1995)
 
@@ -11,6 +11,7 @@ default_embedding_dimension = 8
 default_vocabulary_size = 300
 default_attention_heads_count = 8
 default_transformer_blocks_count = 4
+default_batch_size = 32
 
 
 class GPT(nn.Module):
