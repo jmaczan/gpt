@@ -6,10 +6,11 @@ from torch.nn import functional as F
 class PositionalEncoding(nn.Module):
     def __init__(self, sequence_length, embedding_dim, n=10_000):
         super().__init__()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.positional_encodings = self.precompute_encodings(
             sequence_length, embedding_dim, n
-        )
+        ).to(device)
 
     def forward(self, embeddings):
         """

@@ -65,7 +65,7 @@ def train(
     )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    model = model.to(device)
 
     data_loader = get_data_loader(tokenizer=tokenizer)
 
