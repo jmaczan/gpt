@@ -48,7 +48,7 @@ python src/run.py --from-checkpoint checkpoint_path.pth
 ```py
 from run import run
 
-run(model_path="checkpoint_path.pth")
+run(model_path="checkpoint_path.pth", prompt="Rick:\nMorty, where are you?)
 ```
 
 ## License
