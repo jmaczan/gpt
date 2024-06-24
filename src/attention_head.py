@@ -16,28 +16,27 @@ class AttentionHead(nn.Module):
         nn.init.xavier_uniform_(self.W_V)
 
     def forward(self, embeddings):
-        _, sequence_length, embeddings_dim = embeddings.shape
+        batch_size, sequence_length, embeddings_dim = embeddings.shape
 
         # compute Q, K and V for each token in each of embeddings
         Q = embeddings @ self.W_Q
         K = embeddings @ self.W_K
         V = embeddings @ self.W_V
 
-        attention_scores = (Q @ K.transpose(1, 2)) / torch.sqrt(
+        attention_scores = (Q @ K.transpose(-2, -1)) / torch.sqrt(
             torch.tensor(embeddings_dim, dtype=torch.float32)
         )
 
         # build -inf upper triangle mask
         mask = torch.triu(
-            torch.ones((1, sequence_length, sequence_length)), diagonal=1
-        ).to(embeddings.device)
-        mask = mask.masked_fill(mask == 1, float("-inf"))
+            torch.full((sequence_length, sequence_length), float("-inf")), diagonal=1
+        )
+        mask = mask.unsqueeze(0).expand(batch_size, -1, -1).to(embeddings.device)
 
         masked_scores = attention_scores + mask
 
         # softmax
-        softmax = torch.nn.Softmax(dim=-1)
-        probabilities = softmax(masked_scores)
+        probabilities = torch.nn.Softmax(dim=-1)(masked_scores)
 
         output = probabilities @ V
 
