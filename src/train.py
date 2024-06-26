@@ -9,7 +9,7 @@ from gpt import (
     default_embedding_dimension,
     default_transformer_blocks_count,
     default_vocabulary_size,
-    default_batch_size
+    default_batch_size,
 )
 
 
@@ -26,7 +26,7 @@ def save_checkpoint(model, optimizer, epoch, loss, path, config):
         "model_state_dict": model.state_dict(),
         "optimizer_state_dict": optimizer.state_dict(),
         "loss": loss,
-        "config": config
+        "config": config,
     }
 
     torch.save(checkpoint, path)
@@ -55,7 +55,7 @@ def train(
     heads_count=default_attention_heads_count,
     blocks_count=default_transformer_blocks_count,
     batch_size=default_batch_size,
-    checkpoint_path=None
+    checkpoint_path=None,
 ):
     tokenizer = get_tokenizer()
 
@@ -67,7 +67,7 @@ def train(
         "context_window": context_window,
         "heads_count": heads_count,
         "blocks_count": blocks_count,
-        "batch_size": batch_size
+        "batch_size": batch_size,
     }
 
     model = GPT(
@@ -89,7 +89,9 @@ def train(
     start_epoch = 0
 
     if checkpoint_path and os.path.exists(checkpoint_path):
-        start_epoch, _, loaded_config = load_checkpoint(path=checkpoint_path, model=model, optimizer=optimizer)
+        start_epoch, _, loaded_config = load_checkpoint(
+            path=checkpoint_path, model=model, optimizer=optimizer
+        )
         config.update(loaded_config)
 
     for epoch in range(start_epoch, num_epochs):
@@ -118,7 +120,7 @@ def train(
             epoch=epoch + 1,
             loss=average_loss,
             path=checkpoint_path,
-            config=config
+            config=config,
         )
 
 
@@ -135,5 +137,9 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=default_batch_size)
 
     args = parser.parse_args()
-    train(checkpoint_path=args.from_checkpoint, num_epochs=args.num_epochs, lr=args.lr, batch_size=args.batch_size)
-
+    train(
+        checkpoint_path=args.from_checkpoint,
+        num_epochs=args.num_epochs,
+        lr=args.lr,
+        batch_size=args.batch_size,
+    )
