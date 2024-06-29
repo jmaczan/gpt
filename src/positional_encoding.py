@@ -16,7 +16,7 @@ class PositionalEncoding(nn.Module):
         """
         embeddings = (batch, sequence_length (column), embedding_dim (row))
         """
-        return embeddings + self.positional_encodings[:embeddings.size(1), :]
+        return embeddings + self.positional_encodings[: embeddings.size(1), :]
 
     def precompute_encodings(self, sequence_length, embedding_dim, n=10_000):
 

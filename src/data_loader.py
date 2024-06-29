@@ -24,7 +24,9 @@ def get_tokenizer(model="gpt2"):
     return tokenizer
 
 
-def get_data_loader(tokenizer, batch_size=default_batch_size, data_path="data/dataset.txt"):
+def get_data_loader(
+    tokenizer, batch_size=default_batch_size, data_path="data/dataset.txt"
+):
 
     with open(data_path, "r") as file:
         text = file.read()
