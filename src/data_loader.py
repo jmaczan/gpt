@@ -25,7 +25,10 @@ def get_tokenizer(model="gpt2"):
 
 
 def get_data_loader(
-    tokenizer, batch_size=default_batch_size, data_path="data/dataset.txt"
+    tokenizer,
+    batch_size=default_batch_size,
+    data_path="data/dataset.txt",
+    shuffle=False,
 ):
 
     with open(data_path, "r") as file:
@@ -35,4 +38,4 @@ def get_data_loader(
         text=text, tokenizer=tokenizer, context_window=default_context_window
     )
 
-    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
+    return DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle)
