@@ -10,6 +10,8 @@ class AttentionHead(nn.Module):
         self.W_K = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
         self.W_V = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
 
+        self.dropout = nn.Dropout(0.1)
+
         nn.init.xavier_uniform_(self.W_Q)
         nn.init.xavier_uniform_(self.W_K)
         nn.init.xavier_uniform_(self.W_V)
@@ -37,6 +39,7 @@ class AttentionHead(nn.Module):
 
         masked_scores = attention_scores + mask
         probabilities = torch.nn.Softmax(dim=-1)(masked_scores)
+        probabilities = self.dropout(probabilities)
 
         output = probabilities @ V
 

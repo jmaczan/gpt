@@ -18,9 +18,18 @@ class TextDataset(Dataset):
         return torch.tensor(x), torch.tensor(y)
 
 
+def verify_tokenizer(tokenizer, text="Rick:\nWhat's up?"):
+    tokens = tokenizer.encode(text)
+    decoded_text = tokenizer.decode(tokens)
+    assert text == decoded_text, "Tokenization disrepancy detected"
+
+
 def get_tokenizer(model="gpt2"):
     tokenizer = GPT2Tokenizer.from_pretrained(model)
     tokenizer.pad_token = tokenizer.eos_token
+
+    verify_tokenizer(tokenizer)
+
     return tokenizer
 
 
