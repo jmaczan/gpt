@@ -27,17 +27,13 @@ class AttentionHead(nn.Module):
             torch.tensor(embeddings_dim, dtype=torch.float32, device=embeddings.device)
         )
 
-        mask = torch.triu(
-            torch.full(
-                (sequence_length, sequence_length),
-                float("-inf"),
-                device=embeddings.device,
-            ),
-            diagonal=1,
+        mask = torch.tril(
+            torch.ones(sequence_length, sequence_length, device=embeddings.device)
         )
-        mask = mask.unsqueeze(0).expand(batch_size, -1, -1)
 
-        masked_scores = attention_scores + mask
+        mask = mask.unsqueeze(0)
+
+        masked_scores = attention_scores.masked_fill(mask == 0, float("-inf"))
         probabilities = torch.nn.Softmax(dim=-1)(masked_scores)
         probabilities = self.dropout(probabilities)
 
