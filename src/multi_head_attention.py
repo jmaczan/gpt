@@ -30,11 +30,7 @@ class MultiHeadAttention(nn.Module):
     def forward(self, x):
         batch_size, sequence_length, embedding_dim = x.size()
 
-        x = x.view(batch_size, sequence_length, self.heads_count, self.single_head_size)
-
-        x = x.transpose(1, 2)
-
-        head_outputs = [head(x[:, i, :, :]) for i, head in enumerate(self.heads)]
+        head_outputs = [head(x) for i, head in enumerate(self.heads)]
 
         concatenated_outputs = torch.cat(head_outputs, dim=-1)
 

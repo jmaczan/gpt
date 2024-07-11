@@ -6,7 +6,7 @@ from transformer_block import TransformerBlock
 
 torch.manual_seed(1995)
 
-default_context_window = 512
+default_context_window = 256
 default_embedding_dimension = 256
 default_vocabulary_size = 300
 default_attention_heads_count = 4
@@ -54,10 +54,11 @@ class GPT(nn.Module):
         self.layer_norm = nn.LayerNorm(embedding_dimension)
         self.linear = nn.Linear(embedding_dimension, vocabulary_size)
 
+
     def forward(self, x):
         x = self.embeddings(x)
         x = x + self.positional_encoding(x)
-        x = self.dropout(x)
+        # x = self.dropout(x)
 
         for block in self.transformer_blocks:
             x = block(x)

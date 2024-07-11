@@ -14,9 +14,9 @@ class AttentionHead(nn.Module):
 
         self.dropout = nn.Dropout(0.1)
 
-        nn.init.xavier_uniform_(self.W_Q)
-        nn.init.xavier_uniform_(self.W_K)
-        nn.init.xavier_uniform_(self.W_V)
+        nn.init.xavier_uniform_(self.W_Q.weight)
+        nn.init.xavier_uniform_(self.W_K.weight)
+        nn.init.xavier_uniform_(self.W_V.weight)
 
     def forward(self, embeddings):
         batch_size, sequence_length, embeddings_dim = embeddings.shape
@@ -36,6 +36,8 @@ class AttentionHead(nn.Module):
         attention_scores = torch.nn.Softmax(dim=-1)(attention_scores)
         attention_scores = self.dropout(attention_scores)
 
-        output = self.W_V(attention_scores)
+        value = self.W_V(attention_scores)
+
+        output = attention_scores @ value
 
         return output
