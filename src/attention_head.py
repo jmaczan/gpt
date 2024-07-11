@@ -3,12 +3,14 @@ import torch.nn as nn
 
 
 class AttentionHead(nn.Module):
-    def __init__(self, embedding_dim):
+    def __init__(self, embedding_dim, head_size):
         super().__init__()
 
-        self.W_Q = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
-        self.W_K = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
-        self.W_V = nn.Parameter(torch.empty((embedding_dim, embedding_dim)))
+        self.head_size = head_size
+
+        self.W_Q = nn.Linear(embedding_dim, head_size, bias=False)
+        self.W_K = nn.Linear(embedding_dim, head_size, bias=False)
+        self.W_V = nn.Linear(embedding_dim, head_size, bias=False)
 
         self.dropout = nn.Dropout(0.1)
 
@@ -19,24 +21,21 @@ class AttentionHead(nn.Module):
     def forward(self, embeddings):
         batch_size, sequence_length, embeddings_dim = embeddings.shape
 
-        Q = embeddings @ self.W_Q
-        K = embeddings @ self.W_K
-        V = embeddings @ self.W_V
+        Q = self.W_Q(embeddings)
+        K = self.W_K(embeddings)
 
         attention_scores = (Q @ K.transpose(-2, -1)) / torch.sqrt(
-            torch.tensor(embeddings_dim, dtype=torch.float32, device=embeddings.device)
+            torch.tensor(self.head_size, dtype=torch.float32, device=embeddings.device)
         )
 
         mask = torch.tril(
             torch.ones(sequence_length, sequence_length, device=embeddings.device)
         )
 
-        mask = mask.unsqueeze(0)
+        attention_scores = attention_scores.masked_fill(mask == 0, float("-inf"))
+        attention_scores = torch.nn.Softmax(dim=-1)(attention_scores)
+        attention_scores = self.dropout(attention_scores)
 
-        masked_scores = attention_scores.masked_fill(mask == 0, float("-inf"))
-        probabilities = torch.nn.Softmax(dim=-1)(masked_scores)
-        probabilities = self.dropout(probabilities)
-
-        output = probabilities @ V
+        output = self.W_V(attention_scores)
 
         return output

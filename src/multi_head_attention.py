@@ -17,7 +17,7 @@ class MultiHeadAttention(nn.Module):
         self.heads = nn.ModuleList(
             [
                 AttentionHead(
-                    embedding_dim=self.single_head_size,
+                    embedding_dim=self.embeddings_dim, head_size=self.single_head_size
                 )
                 for _ in range(self.heads_count)
             ]
