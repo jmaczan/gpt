@@ -23,6 +23,7 @@ class AttentionHead(nn.Module):
 
         Q = self.W_Q(embeddings)
         K = self.W_K(embeddings)
+        V = self.W_V(embeddings)
 
         attention_scores = (Q @ K.transpose(-2, -1)) / torch.sqrt(
             torch.tensor(self.head_size, dtype=torch.float32, device=embeddings.device)
@@ -36,8 +37,6 @@ class AttentionHead(nn.Module):
         attention_scores = torch.nn.Softmax(dim=-1)(attention_scores)
         attention_scores = self.dropout(attention_scores)
 
-        value = self.W_V(attention_scores)
-
-        output = attention_scores @ value
+        output = attention_scores @ V
 
         return output

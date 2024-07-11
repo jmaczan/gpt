@@ -81,7 +81,7 @@ def inference(
     return tokenizer.decode(output, skip_special_tokens=True)
 
 
-def run(model_path="checkpoints/best_model.pth", prompt="Rick: What's up?"):
+def run(model_path="checkpoints/best_model.pth", prompt=""):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     tokenizer = get_tokenizer()
