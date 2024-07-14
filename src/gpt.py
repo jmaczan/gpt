@@ -54,7 +54,6 @@ class GPT(nn.Module):
         self.layer_norm = nn.LayerNorm(embedding_dimension)
         self.linear = nn.Linear(embedding_dimension, vocabulary_size)
 
-
     def forward(self, x):
         x = self.embeddings(x)
         x = x + self.positional_encoding(x)

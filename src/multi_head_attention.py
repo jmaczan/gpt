@@ -23,24 +23,25 @@ class MultiHeadAttention(nn.Module):
             ]
         )
 
-        self.W_O = nn.Parameter(torch.empty((embeddings_dim, embeddings_dim)))
+        self.W_O = nn.Linear(embeddings_dim, embeddings_dim, bias=False)
+        self.dropout = nn.Dropout(0.1)
 
         nn.init.xavier_uniform_(self.W_O)
 
     def forward(self, x):
         batch_size, sequence_length, embedding_dim = x.size()
 
-        head_outputs = [head(x) for i, head in enumerate(self.heads)]
+        head_outputs = [head(x) for head in enumerate(self.heads)]
 
         concatenated_outputs = torch.cat(head_outputs, dim=-1)
 
-        concatenated_outputs = (
-            concatenated_outputs.transpose(1, 2)
-            .contiguous()
-            .view(batch_size, sequence_length, embedding_dim)
-        )
-        # output = self.W_O @ concatenated_outputs
+        # concatenated_outputs = (
+        #     concatenated_outputs.transpose(1, 2)
+        #     .contiguous()
+        #     .view(batch_size, sequence_length, embedding_dim)
+        # )
 
-        output = torch.matmul(concatenated_outputs, self.W_O)
+        output = self.W_O(concatenated_outputs)
+        output = self.dropout(output)
 
         return output

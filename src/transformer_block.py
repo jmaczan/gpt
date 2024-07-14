@@ -14,7 +14,6 @@ class TransformerBlock(nn.Module):
         self.multi_head_attention = MultiHeadAttention(
             embeddings_dim=embeddings_dim, heads_count=heads_count
         )
-        self.dropout1 = nn.Dropout(p=0.1)
         self.layer_norm2 = nn.LayerNorm(embeddings_dim)
         self.linear1 = nn.Linear(
             in_features=embeddings_dim, out_features=embeddings_dim * 4
@@ -29,7 +28,6 @@ class TransformerBlock(nn.Module):
         residual = x
         x = self.layer_norm1(x)
         x = self.multi_head_attention(x)
-        x = self.dropout1(x)
         x = residual + x
 
         residual = x
