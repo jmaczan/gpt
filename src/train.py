@@ -14,7 +14,7 @@ from gpt import (
 
 
 default_num_epochs = 50
-default_learning_rate = 3e-4 # 0.001 before, but then I took it from Karpathy's videos
+default_learning_rate = 3e-4  # 0.001 before, but then I took it from Karpathy's videos
 
 checkpoints_directory = "checkpoints"
 os.makedirs(checkpoints_directory, exist_ok=True)

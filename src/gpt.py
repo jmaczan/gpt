@@ -7,11 +7,11 @@ from transformer_block import TransformerBlock
 torch.manual_seed(1995)
 
 default_context_window = 256
-default_embedding_dimension = 256
+default_embedding_dimension = 384
 default_vocabulary_size = 300
-default_attention_heads_count = 4
+default_attention_heads_count = 6
 default_transformer_blocks_count = 6
-default_batch_size = 32
+default_batch_size = 64
 
 
 class GPT(nn.Module):
