@@ -26,12 +26,12 @@ class MultiHeadAttention(nn.Module):
         self.W_O = nn.Linear(embeddings_dim, embeddings_dim, bias=False)
         self.dropout = nn.Dropout(0.1)
 
-        nn.init.xavier_uniform_(self.W_O)
+        nn.init.xavier_uniform_(self.W_O.weight)
 
     def forward(self, x):
         batch_size, sequence_length, embedding_dim = x.size()
 
-        head_outputs = [head(x) for head in enumerate(self.heads)]
+        head_outputs = [head(x) for i, head in enumerate(self.heads)]
 
         concatenated_outputs = torch.cat(head_outputs, dim=-1)
 
