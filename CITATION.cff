@@ -4,6 +4,6 @@ authors:
 - family-names: "Maczan"
   given-names: "Jędrzej Paweł"
   orcid: "https://orcid.org/0000-0003-1741-6064"
-title: "gpt"
+title: "Generative Pre-trained Transformer in PyTorch"
 date-released: 2024-05-05
 url: "https://github.com/jmaczan/gpt"
