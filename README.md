@@ -2,15 +2,6 @@
 
 Generative Pre-trained Transformer in PyTorch from scratch
 
-<figure>
-<div align="center">
-<a href="https://anitamaczan.pl/#problem_n_cial" target="_blank">
-<img src="https://anitamaczan.pl/problem_n_cial.jpg" width="200" alt="'N-body problem' by Anita Maczan, Acrylic on canvas, 80x100, 2024">
-</a>
-</div>
-</p>
-</figure>
-
 ## Train
 
 ### CLI
@@ -51,8 +42,23 @@ from run import run
 run(model_path="checkpoint_path.pth", prompt="Rick:\nMorty, where are you?)
 ```
 
+## Cite
+If you use this software in your research, please use the following citation:
+
+```bibtex
+@misc{Maczan_GPT_2024,
+  title = "Generative Pre-trained Transformer in PyTorch",
+  author = "{Maczan, Jędrzej Paweł}",
+  howpublished = "\url{https://github.com/jmaczan/gpt}",
+  year = 2024,
+  publisher = {GitHub}
+}
+```
+
 ## License
 
 GPL v3
+
+## Author
 
 Jędrzej Maczan, 2024
