@@ -1,5 +1,7 @@
 # gpt
 
+> 💜 See also the article how to build the minimalistic GPT version in Paged Out! #5 Issue, page 6 ["GPT in PyTorch"](https://pagedout.institute/download/PagedOut_005.pdf#page=6)
+
 Generative Pre-trained Transformer in PyTorch from scratch
 
 ## Train
