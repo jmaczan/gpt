@@ -1,8 +1,9 @@
 import torch
 from torch.nn import functional as F
+
 from data_loader import get_tokenizer
-from train import load_checkpoint
 from gpt import GPT
+from helper_funcs import device
 
 default_max_output = 100
 default_temperature = 1.0
@@ -51,7 +52,6 @@ def inference(
     temperature=default_temperature,
     top_k=default_top_k,
 ):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model.eval()
 
@@ -81,9 +81,9 @@ def inference(
     return tokenizer.decode(output, skip_special_tokens=True)
 
 
-def run(model_path="checkpoints/best_model.pth", prompt=""):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+def run(
+    model_path="checkpoints/best_model.pth", prompt="What is the capital of France?"
+):
     tokenizer = get_tokenizer()
 
     model, config = load_model(model_path, device)
