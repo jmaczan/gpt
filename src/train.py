@@ -1,17 +1,18 @@
+import os
+
 import torch
 import torch.nn as nn
-import os
+
 from data_loader import get_data_loader, get_tokenizer
 from gpt import (
     GPT,
-    default_context_window,
     default_attention_heads_count,
+    default_batch_size,
+    default_context_window,
     default_embedding_dimension,
     default_transformer_blocks_count,
-    default_vocabulary_size,
-    default_batch_size,
 )
-
+from helper_funcs import device
 
 default_num_epochs = 50
 default_learning_rate = 3e-4  # 0.001 before, but then I took it from Karpathy's videos
@@ -78,7 +79,6 @@ def train(
         blocks_count=blocks_count,
     )
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
 
     data_loader = get_data_loader(tokenizer=tokenizer)
@@ -102,11 +102,10 @@ def train(
             inputs, targets = inputs.to(device), targets.to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
-            with torch.autograd.detect_anomaly():
-                loss = criterion(outputs.view(-1, vocabulary_size), targets.view(-1))
-                loss.backward()
-                nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-                optimizer.step()
+            loss = criterion(outputs.view(-1, vocabulary_size), targets.view(-1))
+            loss.backward()
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            optimizer.step()
             total_loss += loss.item()
 
         average_loss = total_loss / len(data_loader)
@@ -134,7 +133,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--num-epochs", type=int, default=default_num_epochs)
 
-    parser.add_argument("--lr", type=int, default=default_learning_rate)
+    parser.add_argument("--lr", type=float, default=default_learning_rate)
 
     parser.add_argument("--batch_size", type=int, default=default_batch_size)
 
